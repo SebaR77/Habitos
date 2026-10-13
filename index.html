@@ -62,12 +62,12 @@
       width: 100%;
       max-width: 520px;
       text-align: center;
-      margin-top: 10px;
-      margin-bottom: 8px;
+      margin-top: 6px;
+      margin-bottom: 4px;
     }
 
     header h1 {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       font-weight: 700;
       letter-spacing: 1px;
     }
@@ -85,7 +85,7 @@
     .canvas-container {
       width: 100%;
       position: relative;
-      aspect-ratio: 1 / 0.95;
+      aspect-ratio: 1000 / 950;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -97,30 +97,30 @@
       display: block;
     }
 
-    /* Inputs sobre las líneas horizontales */
-    .habit-inputs-overlay {
+    /* Contenedor absoluto calcado exactamente al canvas */
+    #inputsContainer {
       position: absolute;
-      left: 3%;
-      top: 9%;
-      width: 48%;
-      height: 28%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      pointer-events: auto;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
     }
 
+    /* Cada fila de hábito alineada pixel-perfect */
     .habit-input-row {
+      position: absolute;
       display: flex;
       align-items: center;
-      height: 18%;
+      pointer-events: auto;
+      height: calc(46 / 950 * 100%);
     }
 
     .habit-num {
-      font-size: 0.85rem;
+      font-size: clamp(0.72rem, 2.2vw, 0.85rem);
       font-weight: 700;
       color: #FFFFFF;
-      width: 18px;
+      width: 20px;
       flex-shrink: 0;
     }
 
@@ -130,7 +130,7 @@
       outline: none;
       color: #FFFFFF;
       font-family: 'Comfortaa', cursive, sans-serif;
-      font-size: 0.78rem;
+      font-size: clamp(0.68rem, 2vw, 0.82rem);
       font-weight: 600;
       width: 100%;
       padding-left: 2px;
@@ -277,29 +277,8 @@
     <div class="canvas-container">
       <canvas id="wheelCanvas" width="1000" height="950"></canvas>
       
-      <!-- Campos editables sobre las 5 líneas -->
-      <div class="habit-inputs-overlay">
-        <div class="habit-input-row">
-          <span class="habit-num">1.</span>
-          <input type="text" class="habit-input" id="h-name-0" placeholder="Escribe tu hábito 1...">
-        </div>
-        <div class="habit-input-row">
-          <span class="habit-num">2.</span>
-          <input type="text" class="habit-input" id="h-name-1" placeholder="Escribe tu hábito 2...">
-        </div>
-        <div class="habit-input-row">
-          <span class="habit-num">3.</span>
-          <input type="text" class="habit-input" id="h-name-2" placeholder="Escribe tu hábito 3...">
-        </div>
-        <div class="habit-input-row">
-          <span class="habit-num">4.</span>
-          <input type="text" class="habit-input" id="h-name-3" placeholder="Escribe tu hábito 4...">
-        </div>
-        <div class="habit-input-row">
-          <span class="habit-num">5.</span>
-          <input type="text" class="habit-input" id="h-name-4" placeholder="Escribe tu hábito 5...">
-        </div>
-      </div>
+      <!-- Contenedor alineado milimétricamente con el Canvas -->
+      <div id="inputsContainer"></div>
     </div>
   </div>
 
@@ -352,16 +331,14 @@
     const HABIT_COUNT = 5;
     const DAYS_IN_MONTH = 31;
     const today = new Date();
-    const currentDay = today.getDate(); // Día 1-31
+    const currentDay = today.getDate();
 
-    // Nombres de los meses en español
     const meses = [
       'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
     const currentMonthName = meses[today.getMonth()];
 
-    // Datos por defecto si el usuario nunca ha escrito
     const defaultHabits = [
       "Tomar 2L de agua",
       "Entrenar 30 min",
@@ -370,33 +347,50 @@
       "Dormir 8 horas"
     ];
 
-    // Cargar hábitos guardados
     let habits = JSON.parse(localStorage.getItem('user_habits_names')) || defaultHabits;
-    
-    // Matriz de completados: habitsData[habitIndex][dayIndex] = boolean
     let habitsData = JSON.parse(localStorage.getItem('user_habits_data')) || 
       Array.from({ length: HABIT_COUNT }, () => Array(DAYS_IN_MONTH).fill(false));
-
-    // Metas guardadas
     let targets = JSON.parse(localStorage.getItem('user_habits_targets')) || ["25", "25", "20", "20", "30"];
 
     // Canvas setup
     const canvas = document.getElementById('wheelCanvas');
     const ctx = canvas.getContext('2d');
-    const W = canvas.width;
-    const H = canvas.height;
+    const W = 1000;
+    const H = 950;
     const CX = W * 0.52;
     const CY = H * 0.54;
 
     const R_INNER = 160;
     const RING_THICKNESS = 46;
+    const straightStartX = 50;
+    const straightEndX = CX;
 
     let animProgress = 0;
     let isAnimating = true;
 
-    // Inicializar inputs de nombres de hábitos
+    // Generar inputs posicionados exactamente entre las líneas horizontales
+    const inputsContainer = document.getElementById('inputsContainer');
+    inputsContainer.innerHTML = '';
+
     for (let i = 0; i < HABIT_COUNT; i++) {
-      const input = document.getElementById(`h-name-${i}`);
+      // Línea superior del carril i: rTop = R_INNER + (HABIT_COUNT - i) * RING_THICKNESS
+      // Línea inferior del carril i: rBottom = R_INNER + (HABIT_COUNT - i - 1) * RING_THICKNESS
+      const yTop = CY - (R_INNER + (HABIT_COUNT - i) * RING_THICKNESS);
+      
+      const row = document.createElement('div');
+      row.className = 'habit-input-row';
+      // Posición porcentual exacta respecto a los 1000x950 píxeles
+      row.style.left = `${(straightStartX / W) * 100}%`;
+      row.style.top = `${(yTop / H) * 100}%`;
+      row.style.width = `${((straightEndX - straightStartX - 15) / W) * 100}%`;
+
+      row.innerHTML = `
+        <span class="habit-num">${i + 1}.</span>
+        <input type="text" class="habit-input" id="h-name-${i}" placeholder="Escribe tu hábito ${i + 1}...">
+      `;
+      inputsContainer.appendChild(row);
+
+      const input = row.querySelector('input');
       input.value = habits[i] || '';
       input.addEventListener('input', (e) => {
         habits[i] = e.target.value;
@@ -415,14 +409,12 @@
 
     document.getElementById('currentDayBadge').innerText = `Día ${currentDay}`;
 
-    // Vibración sutil en iPhone
     function triggerHaptic() {
       if (window.navigator && window.navigator.vibrate) {
         window.navigator.vibrate(40);
       }
     }
 
-    // Cartel ¡SIU!
     function showSiu() {
       const banner = document.getElementById('siu-banner');
       banner.classList.add('show');
@@ -431,7 +423,6 @@
       }, 700);
     }
 
-    // Renderizar botones de marcado rápido
     function renderQuickToggles() {
       const container = document.getElementById('togglesContainer');
       container.innerHTML = '';
@@ -464,7 +455,6 @@
       }
     }
 
-    // Actualizar conteos de la tabla inferior
     function updateAchievedCounts() {
       for (let i = 0; i < HABIT_COUNT; i++) {
         const count = habitsData[i].filter(Boolean).length;
@@ -479,14 +469,10 @@
       ctx.fillStyle = '#FFFFFF';
       ctx.lineWidth = 1.6;
 
-      const straightStartX = 50;
-      const straightEndX = CX;
-
-      // 1. Líneas rectas horizontales de hábitos
+      // 1. Líneas rectas horizontales de hábitos (6 líneas para 5 carriles)
       for (let i = 0; i <= HABIT_COUNT; i++) {
         const r = R_INNER + (HABIT_COUNT - i) * RING_THICKNESS;
         const y = CY - r;
-
         const currentLineEnd = straightStartX + (straightEndX - straightStartX) * Math.min(1, progress * 2);
         
         ctx.beginPath();
@@ -495,9 +481,9 @@
         ctx.stroke();
       }
 
-      // Encabezado "Hábitos Diarios"
-      const topY = CY - (R_INNER + HABIT_COUNT * RING_THICKNESS) - 20;
-      ctx.font = '700 24px "Comfortaa"';
+      // Encabezado "Hábitos Diarios" ubicado con buen margen sobre la línea 1
+      const topY = CY - (R_INNER + HABIT_COUNT * RING_THICKNESS) - 18;
+      ctx.font = '700 22px "Comfortaa"';
       ctx.textAlign = 'left';
       ctx.fillText('Hábitos Diarios', straightStartX, topY);
 
@@ -510,7 +496,6 @@
       const monthY = CY;
       ctx.fillText(currentMonthName, CX, monthY);
 
-      // Subrayado
       const textMetrics = ctx.measureText(currentMonthName);
       const underlineWidth = textMetrics.width + 16;
       ctx.lineWidth = 2.5;
@@ -520,7 +505,6 @@
       ctx.stroke();
       ctx.restore();
 
-      // Si aún está en fase temprana de animación recta, retornar
       if (progress < 0.3) return;
 
       const spiralProgress = (progress - 0.3) / 0.7;
