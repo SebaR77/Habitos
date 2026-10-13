@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Rueda de Hábitos</title>
+  
+  <!-- Configuración PWA e iOS Fullscreen -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
+
+  <!-- Fuente Comfortaa -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: #000000;
+      color: #FFFFFF;
+      font-family: 'Comfortaa', cursive, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 24px) 16px;
+      overflow-x: hidden;
+    }
+
+    /* Cartel ¡SIU! animado */
+    #siu-banner {
+      position: fixed;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.2);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+      font-size: 3.2rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #FFFFFF;
+      text-shadow: 0 0 25px rgba(255, 255, 255, 0.95), 0 0 50px rgba(255, 255, 255, 0.5);
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    #siu-banner.show {
+      transform: translateX(-50%) scale(1.15);
+      opacity: 1;
+    }
+
+    header {
+      width: 100%;
+      max-width: 520px;
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* Contenedor principal de la Rueda y los Hábitos */
+    .wheel-card {
+      width: 100%;
+      max-width: 520px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .canvas-container {
+      width: 100%;
+      position: relative;
+      aspect-ratio: 1 / 0.95;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Inputs sobre las líneas horizontales */
+    .habit-inputs-overlay {
+      position: absolute;
+      left: 3%;
+      top: 9%;
+      width: 48%;
+      height: 28%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: auto;
+    }
+
+    .habit-input-row {
+      display: flex;
+      align-items: center;
+      height: 18%;
+    }
+
+    .habit-num {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      width: 18px;
+      flex-shrink: 0;
+    }
+
+    .habit-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #FFFFFF;
+      font-family: 'Comfortaa', cursive, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      width: 100%;
+      padding-left: 2px;
+      user-select: text;
+    }
+
+    .habit-input::placeholder {
+      color: rgba(255, 255, 255, 0.35);
+      font-style: italic;
+    }
+
+    /* Barra de acción rápida para el día de hoy */
+    .quick-actions {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .quick-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .quick-day-badge {
+      background: #FFFFFF;
+      color: #000000;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .habit-toggles {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .toggle-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #FFFFFF;
+      font-family: 'Comfortaa', cursive, sans-serif;
+      padding: 8px 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-btn.done {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #FFFFFF;
+    }
+
+    .toggle-check {
+      width: 20px;
+      height: 20px;
+      border: 1.5px solid #FFFFFF;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .toggle-btn.done .toggle-check {
+      background: #FFFFFF;
+      color: #000000;
+    }
+
+    /* Tabla de metas y resumen */
+    .table-container {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 14px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1.5px solid #FFFFFF;
+      text-align: center;
+      font-size: 0.72rem;
+    }
+
+    th, td {
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      padding: 6px 4px;
+    }
+
+    th {
+      font-weight: 700;
+    }
+
+    td input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #FFFFFF;
+      font-family: 'Comfortaa', cursive, sans-serif;
+      text-align: center;
+      width: 100%;
+      font-size: 0.75rem;
+      user-select: text;
+    }
+
+    .replay-btn {
+      margin-top: 16px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.7);
+      font-family: 'Comfortaa', cursive, sans-serif;
+      font-size: 0.75rem;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Alerta ¡SIU! -->
+  <div id="siu-banner">¡SIU!</div>
+
+  <header>
+    <h1>Rueda de Hábitos</h1>
+  </header>
+
+  <div class="wheel-card">
+    <div class="canvas-container">
+      <canvas id="wheelCanvas" width="1000" height="950"></canvas>
+      
+      <!-- Campos editables sobre las 5 líneas -->
+      <div class="habit-inputs-overlay">
+        <div class="habit-input-row">
+          <span class="habit-num">1.</span>
+          <input type="text" class="habit-input" id="h-name-0" placeholder="Escribe tu hábito 1...">
+        </div>
+        <div class="habit-input-row">
+          <span class="habit-num">2.</span>
+          <input type="text" class="habit-input" id="h-name-1" placeholder="Escribe tu hábito 2...">
+        </div>
+        <div class="habit-input-row">
+          <span class="habit-num">3.</span>
+          <input type="text" class="habit-input" id="h-name-2" placeholder="Escribe tu hábito 3...">
+        </div>
+        <div class="habit-input-row">
+          <span class="habit-num">4.</span>
+          <input type="text" class="habit-input" id="h-name-3" placeholder="Escribe tu hábito 4...">
+        </div>
+        <div class="habit-input-row">
+          <span class="habit-num">5.</span>
+          <input type="text" class="habit-input" id="h-name-4" placeholder="Escribe tu hábito 5...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de marcado rápido para el día de hoy -->
+  <div class="quick-actions">
+    <div class="quick-title">
+      <span>Marcar día de hoy</span>
+      <span class="quick-day-badge" id="currentDayBadge">Día --</span>
+    </div>
+    <div class="habit-toggles" id="togglesContainer"></div>
+  </div>
+
+  <!-- Tabla inferior -->
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 25%;"></th>
+          <th>Hábito 1</th>
+          <th>Hábito 2</th>
+          <th>Hábito 3</th>
+          <th>Hábito 4</th>
+          <th>Hábito 5</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight: 700;">Meta del Mes</td>
+          <td><input type="text" id="target-0" value="25"></td>
+          <td><input type="text" id="target-1" value="25"></td>
+          <td><input type="text" id="target-2" value="20"></td>
+          <td><input type="text" id="target-3" value="20"></td>
+          <td><input type="text" id="target-4" value="30"></td>
+        </tr>
+        <tr>
+          <td style="font-weight: 700;">Días Logrados</td>
+          <td id="achieved-0">0</td>
+          <td id="achieved-1">0</td>
+          <td id="achieved-2">0</td>
+          <td id="achieved-3">0</td>
+          <td id="achieved-4">0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <button class="replay-btn" id="replayBtn">↻ Ver animación de entrada</button>
+
+  <script>
+    const HABIT_COUNT = 5;
+    const DAYS_IN_MONTH = 31;
+    const today = new Date();
+    const currentDay = today.getDate(); // Día 1-31
+
+    // Nombres de los meses en español
+    const meses = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    const currentMonthName = meses[today.getMonth()];
+
+    // Datos por defecto si el usuario nunca ha escrito
+    const defaultHabits = [
+      "Tomar 2L de agua",
+      "Entrenar 30 min",
+      "Leer 15 páginas",
+      "Cero azúcar refinada",
+      "Dormir 8 horas"
+    ];
+
+    // Cargar hábitos guardados
+    let habits = JSON.parse(localStorage.getItem('user_habits_names')) || defaultHabits;
+    
+    // Matriz de completados: habitsData[habitIndex][dayIndex] = boolean
+    let habitsData = JSON.parse(localStorage.getItem('user_habits_data')) || 
+      Array.from({ length: HABIT_COUNT }, () => Array(DAYS_IN_MONTH).fill(false));
+
+    // Metas guardadas
+    let targets = JSON.parse(localStorage.getItem('user_habits_targets')) || ["25", "25", "20", "20", "30"];
+
+    // Canvas setup
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+    const CX = W * 0.52;
+    const CY = H * 0.54;
+
+    const R_INNER = 160;
+    const RING_THICKNESS = 46;
+
+    let animProgress = 0;
+    let isAnimating = true;
+
+    // Inicializar inputs de nombres de hábitos
+    for (let i = 0; i < HABIT_COUNT; i++) {
+      const input = document.getElementById(`h-name-${i}`);
+      input.value = habits[i] || '';
+      input.addEventListener('input', (e) => {
+        habits[i] = e.target.value;
+        localStorage.setItem('user_habits_names', JSON.stringify(habits));
+        renderQuickToggles();
+      });
+
+      // Metas
+      const targetInput = document.getElementById(`target-${i}`);
+      targetInput.value = targets[i] || '';
+      targetInput.addEventListener('input', (e) => {
+        targets[i] = e.target.value;
+        localStorage.setItem('user_habits_targets', JSON.stringify(targets));
+      });
+    }
+
+    document.getElementById('currentDayBadge').innerText = `Día ${currentDay}`;
+
+    // Vibración sutil en iPhone
+    function triggerHaptic() {
+      if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(40);
+      }
+    }
+
+    // Cartel ¡SIU!
+    function showSiu() {
+      const banner = document.getElementById('siu-banner');
+      banner.classList.add('show');
+      setTimeout(() => {
+        banner.classList.remove('show');
+      }, 700);
+    }
+
+    // Renderizar botones de marcado rápido
+    function renderQuickToggles() {
+      const container = document.getElementById('togglesContainer');
+      container.innerHTML = '';
+      const dayIdx = Math.min(currentDay - 1, DAYS_IN_MONTH - 1);
+
+      for (let i = 0; i < HABIT_COUNT; i++) {
+        const isDone = habitsData[i][dayIdx];
+        const btn = document.createElement('button');
+        btn.className = `toggle-btn ${isDone ? 'done' : ''}`;
+        btn.innerHTML = `
+          <span><strong>${i + 1}.</strong> ${habits[i] || 'Hábito ' + (i + 1)}</span>
+          <div class="toggle-check">${isDone ? '✓' : ''}</div>
+        `;
+
+        btn.addEventListener('click', () => {
+          habitsData[i][dayIdx] = !habitsData[i][dayIdx];
+          localStorage.setItem('user_habits_data', JSON.stringify(habitsData));
+          
+          if (habitsData[i][dayIdx]) {
+            showSiu();
+            triggerHaptic();
+          }
+
+          updateAchievedCounts();
+          renderQuickToggles();
+          draw(1);
+        });
+
+        container.appendChild(btn);
+      }
+    }
+
+    // Actualizar conteos de la tabla inferior
+    function updateAchievedCounts() {
+      for (let i = 0; i < HABIT_COUNT; i++) {
+        const count = habitsData[i].filter(Boolean).length;
+        document.getElementById(`achieved-${i}`).innerText = count;
+      }
+    }
+
+    // DIBUJAR LA RUEDA Y LÍNEAS
+    function draw(progress) {
+      ctx.clearRect(0, 0, W, H);
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.lineWidth = 1.6;
+
+      const straightStartX = 50;
+      const straightEndX = CX;
+
+      // 1. Líneas rectas horizontales de hábitos
+      for (let i = 0; i <= HABIT_COUNT; i++) {
+        const r = R_INNER + (HABIT_COUNT - i) * RING_THICKNESS;
+        const y = CY - r;
+
+        const currentLineEnd = straightStartX + (straightEndX - straightStartX) * Math.min(1, progress * 2);
+        
+        ctx.beginPath();
+        ctx.moveTo(straightStartX, y);
+        ctx.lineTo(currentLineEnd, y);
+        ctx.stroke();
+      }
+
+      // Encabezado "Hábitos Diarios"
+      const topY = CY - (R_INNER + HABIT_COUNT * RING_THICKNESS) - 20;
+      ctx.font = '700 24px "Comfortaa"';
+      ctx.textAlign = 'left';
+      ctx.fillText('Hábitos Diarios', straightStartX, topY);
+
+      // 2. Mes al centro: Tipografía Comfortaa, en negrita y subrayado
+      ctx.save();
+      ctx.font = '700 32px "Comfortaa"';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      const monthY = CY;
+      ctx.fillText(currentMonthName, CX, monthY);
+
+      // Subrayado
+      const textMetrics = ctx.measureText(currentMonthName);
+      const underlineWidth = textMetrics.width + 16;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(CX - underlineWidth / 2, monthY + 22);
+      ctx.lineTo(CX + underlineWidth / 2, monthY + 22);
+      ctx.stroke();
+      ctx.restore();
+
+      // Si aún está en fase temprana de animación recta, retornar
+      if (progress < 0.3) return;
+
+      const spiralProgress = (progress - 0.3) / 0.7;
+      const startAngle = -Math.PI / 2; // arriba
+      const totalSweep = 2 * Math.PI * 0.75; // 270 grados
+      const currentSweep = totalSweep * spiralProgress;
+
+      // 3. Arcos concéntricos de la espiral
+      for (let i = 0; i <= HABIT_COUNT; i++) {
+        const r = R_INNER + (HABIT_COUNT - i) * RING_THICKNESS;
+        ctx.beginPath();
+        ctx.arc(CX, CY, r, startAngle, startAngle + currentSweep, false);
+        ctx.stroke();
+      }
+
+      // 4. Rayos divisores de los 31 días y números exteriores
+      const dayAngleStep = totalSweep / DAYS_IN_MONTH;
+
+      for (let d = 0; d <= DAYS_IN_MONTH; d++) {
+        const angle = startAngle + d * dayAngleStep;
+        if (angle > startAngle + currentSweep) break;
+
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+
+        ctx.beginPath();
+        ctx.moveTo(CX + R_INNER * cos, CY + R_INNER * sin);
+        ctx.lineTo(CX + (R_INNER + HABIT_COUNT * RING_THICKNESS) * cos, CY + (R_INNER + HABIT_COUNT * RING_THICKNESS) * sin);
+        ctx.stroke();
+
+        // Número de día en el perímetro exterior
+        if (d > 0) {
+          const midAngle = startAngle + (d - 0.5) * dayAngleStep;
+          const numR = R_INNER + HABIT_COUNT * RING_THICKNESS + 24;
+          const nx = CX + numR * Math.cos(midAngle);
+          const ny = CY + numR * Math.sin(midAngle);
+
+          ctx.save();
+          ctx.font = '600 15px "Comfortaa"';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(d.toString(), nx, ny);
+          ctx.restore();
+        }
+      }
+
+      // 5. Tics completados dentro de las celdas
+      for (let h = 0; h < HABIT_COUNT; h++) {
+        const rMid = R_INNER + (HABIT_COUNT - h - 0.5) * RING_THICKNESS;
+        for (let d = 0; d < DAYS_IN_MONTH; d++) {
+          if (habitsData[h][d]) {
+            const angleMid = startAngle + (d + 0.5) * dayAngleStep;
+            if (angleMid <= startAngle + currentSweep) {
+              const x = CX + rMid * Math.cos(angleMid);
+              const y = CY + rMid * Math.sin(angleMid);
+
+              ctx.save();
+              ctx.font = '700 20px "Comfortaa"';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText('✓', x, y);
+              ctx.restore();
+            }
+          }
+        }
+      }
+    }
+
+    // Animación de entrada inicial
+    function runAnimation() {
+      animProgress = 0;
+      isAnimating = true;
+
+      function step() {
+        animProgress += 0.025;
+        if (animProgress >= 1) {
+          animProgress = 1;
+          isAnimating = false;
+          draw(1);
+        } else {
+          draw(animProgress);
+          requestAnimationFrame(step);
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    document.getElementById('replayBtn').addEventListener('click', runAnimation);
+
+    // Inicializar
+    updateAchievedCounts();
+    renderQuickToggles();
+    runAnimation();
+  </script>
+</body>
+</html>
