@@ -2,12 +2,16 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- Zoom habilitado para explorar la rueda -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes, viewport-fit=cover">
   <title>Rueda de Hábitos</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
+
+  <!-- Ícono oficial para la pantalla de inicio de iPhone (Rueda espiral minimalista) -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180' width='180' height='180'%3E%3Crect width='180' height='180' fill='%23000000' rx='40'/%3E%3Ccircle cx='90' cy='90' r='55' fill='none' stroke='%23FFFFFF' stroke-width='6' stroke-dasharray='220 50'/%3E%3Ccircle cx='90' cy='90' r='38' fill='none' stroke='%23FFFFFF' stroke-width='5' stroke-dasharray='150 40'/%3E%3Ccircle cx='90' cy='90' r='22' fill='none' stroke='%23FFFFFF' stroke-width='4' stroke-dasharray='90 30'/%3E%3Ccircle cx='90' cy='35' r='5' fill='%2300FF66'/%3E%3C/svg%3E">
 
   <!-- Fuente Comfortaa -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,7 +24,6 @@
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
-      user-select: none;
     }
 
     body {
@@ -50,10 +53,36 @@
       color: #FFFFFF;
       text-shadow: 0 0 25px rgba(255, 255, 255, 0.95), 0 0 50px rgba(255, 255, 255, 0.5);
       transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      white-space: nowrap;
     }
 
     #siu-banner.show {
       transform: translateX(-50%) scale(1.15);
+      opacity: 1;
+    }
+
+    /* Cartel FELICITACIONES CRACK */
+    #congrats-banner {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.3);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9999;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #000000;
+      background: #FFFFFF;
+      padding: 12px 20px;
+      border-radius: 30px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      white-space: nowrap;
+    }
+
+    #congrats-banner.show {
+      transform: translateX(-50%) scale(1);
       opacity: 1;
     }
 
@@ -62,7 +91,7 @@
       max-width: 500px;
       text-align: center;
       margin-top: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
     }
 
     header h1 {
@@ -71,13 +100,34 @@
       letter-spacing: 1px;
     }
 
+    /* Selector sutil de Mes */
+    .month-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .month-nav button {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #FFFFFF;
+      font-family: 'Comfortaa', cursive, sans-serif;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
     .main-wrapper {
       width: 100%;
       max-width: 500px;
       position: relative;
     }
 
-    /* Título de Hábitos Diarios con espacio de sobra */
     .section-title {
       font-size: 0.95rem;
       font-weight: 700;
@@ -99,7 +149,6 @@
       overflow: visible;
     }
 
-    /* Inputs HTML integrados con precisión absoluta */
     .inputs-layer {
       position: absolute;
       top: 0;
@@ -119,7 +168,6 @@
       pointer-events: auto;
     }
 
-    /* Coordenadas calculadas exactamente para los 5 carriles */
     .slot-1 { top: 14.5%; }
     .slot-2 { top: 19.5%; }
     .slot-3 { top: 24.5%; }
@@ -152,7 +200,6 @@
       font-style: italic;
     }
 
-    /* Panel de marcado rápido */
     .quick-actions {
       width: 100%;
       max-width: 500px;
@@ -224,7 +271,6 @@
       color: #000000;
     }
 
-    /* Tabla resumen */
     .table-container {
       width: 100%;
       max-width: 500px;
@@ -277,10 +323,17 @@
 <body>
 
   <div id="siu-banner">¡SIU!</div>
+  <div id="congrats-banner">🎉 ¡FELICITACIONES CRACK! 🎉</div>
 
   <header>
     <h1>Rueda de Hábitos</h1>
   </header>
+
+  <div class="month-nav">
+    <button id="prevMonthBtn">◀</button>
+    <span id="monthNavLabel">Octubre 2026</span>
+    <button id="nextMonthBtn">▶</button>
+  </div>
 
   <div class="main-wrapper">
     <div class="section-title">Hábitos Diarios</div>
@@ -288,7 +341,6 @@
     <div class="spiral-container">
       <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 1000 920"></svg>
       
-      <!-- Las 5 franjas para escribir, centradas verticalmente entre sus dos líneas -->
       <div class="inputs-layer">
         <div class="slot slot-1">
           <span class="slot-num">1.</span>
@@ -339,11 +391,11 @@
       <tbody>
         <tr>
           <td style="font-weight: 700;">Meta del Mes</td>
-          <td><input type="text" id="target-0" value="25"></td>
-          <td><input type="text" id="target-1" value="25"></td>
-          <td><input type="text" id="target-2" value="20"></td>
-          <td><input type="text" id="target-3" value="20"></td>
-          <td><input type="text" id="target-4" value="30"></td>
+          <td><input type="text" id="target-0"></td>
+          <td><input type="text" id="target-1"></td>
+          <td><input type="text" id="target-2"></td>
+          <td><input type="text" id="target-3"></td>
+          <td><input type="text" id="target-4"></td>
         </tr>
         <tr>
           <td style="font-weight: 700;">Días Logrados</td>
@@ -361,15 +413,19 @@
 
   <script>
     const HABIT_COUNT = 5;
-    const DAYS_IN_MONTH = 31;
     const today = new Date();
-    const currentDay = today.getDate();
+    const realCurrentDay = today.getDate();
+    const realCurrentMonth = today.getMonth();
+    const realCurrentYear = today.getFullYear();
+
+    // Estado del mes visualizado
+    let viewYear = realCurrentYear;
+    let viewMonth = realCurrentMonth;
 
     const meses = [
       'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
       'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
-    const currentMonthName = meses[today.getMonth()];
 
     const defaultHabits = [
       "Tomar 2L de agua",
@@ -379,12 +435,38 @@
       "Dormir 8 horas"
     ];
 
+    // Cargar nombres globales de hábitos
     let habits = JSON.parse(localStorage.getItem('user_habits_names')) || defaultHabits;
-    let habitsData = JSON.parse(localStorage.getItem('user_habits_data')) || 
-      Array.from({ length: HABIT_COUNT }, () => Array(DAYS_IN_MONTH).fill(false));
-    let targets = JSON.parse(localStorage.getItem('user_habits_targets')) || ["25", "25", "20", "20", "30"];
 
-    // Configuración Geométrica de la Rueda (en sistema SVG 1000 x 920)
+    function getMonthKey(y, m) {
+      return `habits_${y}_${String(m + 1).padStart(2, '0')}`;
+    }
+
+    function getDaysInViewMonth() {
+      return new Date(viewYear, viewMonth + 1, 0).getDate();
+    }
+
+    function loadMonthData() {
+      const key = getMonthKey(viewYear, viewMonth);
+      const days = getDaysInViewMonth();
+      
+      let data = JSON.parse(localStorage.getItem(key));
+      if (!data) {
+        data = Array.from({ length: HABIT_COUNT }, () => Array(days).fill(false));
+      }
+      return data;
+    }
+
+    function loadMonthTargets() {
+      const key = `${getMonthKey(viewYear, viewMonth)}_targets`;
+      const days = getDaysInViewMonth();
+      return JSON.parse(localStorage.getItem(key)) || Array(HABIT_COUNT).fill(days.toString());
+    }
+
+    let habitsData = loadMonthData();
+    let targets = loadMonthTargets();
+
+    // SVG Config
     const CX = 520;
     const CY = 520;
     const R_INNER = 160;
@@ -392,7 +474,7 @@
     const straightStartX = 25;
     const straightEndX = CX;
 
-    // Conectar inputs de hábitos y metas
+    // Inicializar inputs de hábitos
     for (let i = 0; i < HABIT_COUNT; i++) {
       const input = document.getElementById(`h-name-${i}`);
       input.value = habits[i] || '';
@@ -403,14 +485,19 @@
       });
 
       const targetInput = document.getElementById(`target-${i}`);
-      targetInput.value = targets[i] || '';
       targetInput.addEventListener('input', (e) => {
         targets[i] = e.target.value;
-        localStorage.setItem('user_habits_targets', JSON.stringify(targets));
+        const key = `${getMonthKey(viewYear, viewMonth)}_targets`;
+        localStorage.setItem(key, JSON.stringify(targets));
+        checkFullCompletion(i);
       });
     }
 
-    document.getElementById('currentDayBadge').innerText = `Día ${currentDay}`;
+    function updateTargetsUI() {
+      for (let i = 0; i < HABIT_COUNT; i++) {
+        document.getElementById(`target-${i}`).value = targets[i];
+      }
+    }
 
     function triggerHaptic() {
       if (window.navigator && window.navigator.vibrate) {
@@ -421,15 +508,31 @@
     function showSiu() {
       const banner = document.getElementById('siu-banner');
       banner.classList.add('show');
-      setTimeout(() => {
-        banner.classList.remove('show');
-      }, 700);
+      setTimeout(() => banner.classList.remove('show'), 700);
+    }
+
+    function showCongrats() {
+      const banner = document.getElementById('congrats-banner');
+      banner.classList.add('show');
+      setTimeout(() => banner.classList.remove('show'), 2200);
+    }
+
+    function checkFullCompletion(habitIdx) {
+      const count = habitsData[habitIdx].filter(Boolean).length;
+      const target = parseInt(targets[habitIdx], 10);
+      if (target > 0 && count === target) {
+        showCongrats();
+      }
     }
 
     function renderQuickToggles() {
       const container = document.getElementById('togglesContainer');
       container.innerHTML = '';
-      const dayIdx = Math.min(currentDay - 1, DAYS_IN_MONTH - 1);
+      
+      const isCurrentMonthView = (viewYear === realCurrentYear && viewMonth === realCurrentMonth);
+      document.getElementById('currentDayBadge').innerText = isCurrentMonthView ? `Día ${realCurrentDay}` : `Mes ${meses[viewMonth]}`;
+      
+      const dayIdx = Math.min(realCurrentDay - 1, getDaysInViewMonth() - 1);
 
       for (let i = 0; i < HABIT_COUNT; i++) {
         const isDone = habitsData[i][dayIdx];
@@ -442,11 +545,12 @@
 
         btn.addEventListener('click', () => {
           habitsData[i][dayIdx] = !habitsData[i][dayIdx];
-          localStorage.setItem('user_habits_data', JSON.stringify(habitsData));
+          localStorage.setItem(getMonthKey(viewYear, viewMonth), JSON.stringify(habitsData));
           
           if (habitsData[i][dayIdx]) {
             showSiu();
             triggerHaptic();
+            checkFullCompletion(i);
           }
 
           updateAchievedCounts();
@@ -465,9 +569,9 @@
       }
     }
 
-    // Renderizado SVG preciso
     function renderSvg(progress) {
       const svg = document.getElementById('wheelSvg');
+      const days = getDaysInViewMonth();
       let html = '';
 
       // 1. Líneas rectas horizontales
@@ -475,11 +579,11 @@
         const r = R_INNER + (HABIT_COUNT - i) * RING_THICKNESS;
         const y = CY - r;
         const curX2 = straightStartX + (straightEndX - straightStartX) * Math.min(1, progress * 2);
-
         html += `<line x1="${straightStartX}" y1="${y}" x2="${curX2}" y2="${y}" stroke="#FFFFFF" stroke-width="1.8" />`;
       }
 
-      // 2. Mes dinámico al centro, en negrita y subrayado
+      // 2. Mes dinámico al centro
+      const currentMonthName = meses[viewMonth];
       html += `
         <text x="${CX}" y="${CY - 6}" fill="#FFFFFF" font-size="34" font-weight="700" font-family="Comfortaa" text-anchor="middle" dominant-baseline="middle">
           ${currentMonthName}
@@ -492,7 +596,7 @@
         const startAngle = -Math.PI / 2;
         const totalSweep = 2 * Math.PI * 0.75;
         const currentSweep = totalSweep * spiralProgress;
-        const dayAngleStep = totalSweep / DAYS_IN_MONTH;
+        const dayAngleStep = totalSweep / days;
 
         // 3. Arcos concéntricos
         for (let i = 0; i <= HABIT_COUNT; i++) {
@@ -503,12 +607,13 @@
           const x2 = CX + r * Math.cos(endA);
           const y2 = CY + r * Math.sin(endA);
           const largeArc = currentSweep > Math.PI ? 1 : 0;
-
           html += `<path d="M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}" fill="none" stroke="#FFFFFF" stroke-width="1.8" />`;
         }
 
-        // 4. Rayos divisores de días y números exteriores
-        for (let d = 0; d <= DAYS_IN_MONTH; d++) {
+        // 4. Rayos divisores, números y puntito verde de hoy
+        const isCurrentMonthView = (viewYear === realCurrentYear && viewMonth === realCurrentMonth);
+
+        for (let d = 0; d <= days; d++) {
           const a = startAngle + d * dayAngleStep;
           if (a > startAngle + currentSweep) break;
 
@@ -521,7 +626,6 @@
 
           html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#FFFFFF" stroke-width="1.4" />`;
 
-          // Números de días
           if (d > 0) {
             const midA = startAngle + (d - 0.5) * dayAngleStep;
             const rNum = R_INNER + HABIT_COUNT * RING_THICKNESS + 25;
@@ -529,14 +633,22 @@
             const ny = CY + rNum * Math.sin(midA);
 
             html += `<text x="${nx}" y="${ny}" fill="#FFFFFF" font-size="16" font-weight="600" font-family="Comfortaa" text-anchor="middle" dominant-baseline="middle">${d}</text>`;
+
+            // PUNTITO VERDE SOBRE EL DÍA ACTUAL
+            if (isCurrentMonthView && d === realCurrentDay) {
+              const rDot = R_INNER + HABIT_COUNT * RING_THICKNESS + 42;
+              const dotX = CX + rDot * Math.cos(midA);
+              const dotY = CY + rDot * Math.sin(midA);
+              html += `<circle cx="${dotX}" cy="${dotY}" r="4.5" fill="#00FF66" filter="drop-shadow(0 0 6px #00FF66)" />`;
+            }
           }
         }
 
         // 5. Tics completados
         for (let h = 0; h < HABIT_COUNT; h++) {
           const rMid = R_INNER + (HABIT_COUNT - h - 0.5) * RING_THICKNESS;
-          for (let d = 0; d < DAYS_IN_MONTH; d++) {
-            if (habitsData[h][d]) {
+          for (let d = 0; d < days; d++) {
+            if (habitsData[h] && habitsData[h][d]) {
               const midA = startAngle + (d + 0.5) * dayAngleStep;
               if (midA <= startAngle + currentSweep) {
                 const tx = CX + rMid * Math.cos(midA);
@@ -551,7 +663,35 @@
       svg.innerHTML = html;
     }
 
-    // Animación de entrada
+    // Navegación de mes
+    function updateMonthNavigation() {
+      document.getElementById('monthNavLabel').innerText = `${meses[viewMonth]} ${viewYear}`;
+      habitsData = loadMonthData();
+      targets = loadMonthTargets();
+      updateTargetsUI();
+      updateAchievedCounts();
+      renderQuickToggles();
+      renderSvg(1);
+    }
+
+    document.getElementById('prevMonthBtn').addEventListener('click', () => {
+      viewMonth--;
+      if (viewMonth < 0) {
+        viewMonth = 11;
+        viewYear--;
+      }
+      updateMonthNavigation();
+    });
+
+    document.getElementById('nextMonthBtn').addEventListener('click', () => {
+      viewMonth++;
+      if (viewMonth > 11) {
+        viewMonth = 0;
+        viewYear++;
+      }
+      updateMonthNavigation();
+    });
+
     let animProgress = 0;
     function runAnimation() {
       animProgress = 0;
@@ -570,9 +710,8 @@
 
     document.getElementById('replayBtn').addEventListener('click', runAnimation);
 
-    // Inicializar
-    updateAchievedCounts();
-    renderQuickToggles();
+    // Arranque inicial
+    updateMonthNavigation();
     runAnimation();
   </script>
 </body>
