@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Rueda de Hábitos</title>
   
-  <!-- Configuración PWA e iOS Fullscreen -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
@@ -39,7 +38,7 @@
     /* Cartel ¡SIU! animado */
     #siu-banner {
       position: fixed;
-      top: 50px;
+      top: 55px;
       left: 50%;
       transform: translateX(-50%) scale(0.2);
       opacity: 0;
@@ -60,45 +59,48 @@
 
     header {
       width: 100%;
-      max-width: 520px;
+      max-width: 500px;
       text-align: center;
       margin-top: 6px;
-      margin-bottom: 4px;
+      margin-bottom: 12px;
     }
 
     header h1 {
-      font-size: 1.45rem;
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: 1px;
     }
 
-    /* Contenedor principal de la Rueda y los Hábitos */
-    .wheel-card {
+    .main-wrapper {
       width: 100%;
-      max-width: 520px;
+      max-width: 500px;
       position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
-    .canvas-container {
-      width: 100%;
-      position: relative;
-      aspect-ratio: 1000 / 950;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    /* Título de Hábitos Diarios con espacio de sobra */
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-left: 6px;
+      margin-bottom: 8px;
+      color: #FFFFFF;
     }
 
-    canvas {
+    .spiral-container {
+      width: 100%;
+      position: relative;
+      aspect-ratio: 1000 / 920;
+    }
+
+    svg.wheel-svg {
       width: 100%;
       height: 100%;
       display: block;
+      overflow: visible;
     }
 
-    /* Contenedor absoluto calcado exactamente al canvas */
-    #inputsContainer {
+    /* Inputs HTML integrados con precisión absoluta */
+    .inputs-layer {
       position: absolute;
       top: 0;
       left: 0;
@@ -107,24 +109,32 @@
       pointer-events: none;
     }
 
-    /* Cada fila de hábito alineada pixel-perfect */
-    .habit-input-row {
+    .slot {
       position: absolute;
+      left: 3%;
+      width: 46%;
+      height: 5%;
       display: flex;
       align-items: center;
       pointer-events: auto;
-      height: calc(46 / 950 * 100%);
     }
 
-    .habit-num {
-      font-size: clamp(0.72rem, 2.2vw, 0.85rem);
+    /* Coordenadas calculadas exactamente para los 5 carriles */
+    .slot-1 { top: 14.5%; }
+    .slot-2 { top: 19.5%; }
+    .slot-3 { top: 24.5%; }
+    .slot-4 { top: 29.5%; }
+    .slot-5 { top: 34.5%; }
+
+    .slot-num {
+      width: 22px;
+      font-size: clamp(0.72rem, 2.3vw, 0.88rem);
       font-weight: 700;
       color: #FFFFFF;
-      width: 20px;
       flex-shrink: 0;
     }
 
-    .habit-input {
+    .slot-input {
       background: transparent;
       border: none;
       outline: none;
@@ -133,20 +143,20 @@
       font-size: clamp(0.68rem, 2vw, 0.82rem);
       font-weight: 600;
       width: 100%;
-      padding-left: 2px;
+      padding-left: 4px;
       user-select: text;
     }
 
-    .habit-input::placeholder {
-      color: rgba(255, 255, 255, 0.35);
+    .slot-input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
       font-style: italic;
     }
 
-    /* Barra de acción rápida para el día de hoy */
+    /* Panel de marcado rápido */
     .quick-actions {
       width: 100%;
-      max-width: 520px;
-      margin-top: 10px;
+      max-width: 500px;
+      margin-top: 14px;
       padding: 12px;
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 12px;
@@ -214,10 +224,10 @@
       color: #000000;
     }
 
-    /* Tabla de metas y resumen */
+    /* Tabla resumen */
     .table-container {
       width: 100%;
-      max-width: 520px;
+      max-width: 500px;
       margin-top: 14px;
       overflow-x: auto;
     }
@@ -266,19 +276,41 @@
 </head>
 <body>
 
-  <!-- Alerta ¡SIU! -->
   <div id="siu-banner">¡SIU!</div>
 
   <header>
     <h1>Rueda de Hábitos</h1>
   </header>
 
-  <div class="wheel-card">
-    <div class="canvas-container">
-      <canvas id="wheelCanvas" width="1000" height="950"></canvas>
+  <div class="main-wrapper">
+    <div class="section-title">Hábitos Diarios</div>
+
+    <div class="spiral-container">
+      <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 1000 920"></svg>
       
-      <!-- Contenedor alineado milimétricamente con el Canvas -->
-      <div id="inputsContainer"></div>
+      <!-- Las 5 franjas para escribir, centradas verticalmente entre sus dos líneas -->
+      <div class="inputs-layer">
+        <div class="slot slot-1">
+          <span class="slot-num">1.</span>
+          <input type="text" class="slot-input" id="h-name-0" placeholder="Escribe tu hábito 1...">
+        </div>
+        <div class="slot slot-2">
+          <span class="slot-num">2.</span>
+          <input type="text" class="slot-input" id="h-name-1" placeholder="Escribe tu hábito 2...">
+        </div>
+        <div class="slot slot-3">
+          <span class="slot-num">3.</span>
+          <input type="text" class="slot-input" id="h-name-2" placeholder="Escribe tu hábito 3...">
+        </div>
+        <div class="slot slot-4">
+          <span class="slot-num">4.</span>
+          <input type="text" class="slot-input" id="h-name-3" placeholder="Escribe tu hábito 4...">
+        </div>
+        <div class="slot slot-5">
+          <span class="slot-num">5.</span>
+          <input type="text" class="slot-input" id="h-name-4" placeholder="Escribe tu hábito 5...">
+        </div>
+      </div>
     </div>
   </div>
 
@@ -352,45 +384,17 @@
       Array.from({ length: HABIT_COUNT }, () => Array(DAYS_IN_MONTH).fill(false));
     let targets = JSON.parse(localStorage.getItem('user_habits_targets')) || ["25", "25", "20", "20", "30"];
 
-    // Canvas setup
-    const canvas = document.getElementById('wheelCanvas');
-    const ctx = canvas.getContext('2d');
-    const W = 1000;
-    const H = 950;
-    const CX = W * 0.52;
-    const CY = H * 0.54;
-
+    // Configuración Geométrica de la Rueda (en sistema SVG 1000 x 920)
+    const CX = 520;
+    const CY = 520;
     const R_INNER = 160;
     const RING_THICKNESS = 46;
-    const straightStartX = 50;
+    const straightStartX = 25;
     const straightEndX = CX;
 
-    let animProgress = 0;
-    let isAnimating = true;
-
-    // Generar inputs posicionados exactamente entre las líneas horizontales
-    const inputsContainer = document.getElementById('inputsContainer');
-    inputsContainer.innerHTML = '';
-
+    // Conectar inputs de hábitos y metas
     for (let i = 0; i < HABIT_COUNT; i++) {
-      // Línea superior del carril i: rTop = R_INNER + (HABIT_COUNT - i) * RING_THICKNESS
-      // Línea inferior del carril i: rBottom = R_INNER + (HABIT_COUNT - i - 1) * RING_THICKNESS
-      const yTop = CY - (R_INNER + (HABIT_COUNT - i) * RING_THICKNESS);
-      
-      const row = document.createElement('div');
-      row.className = 'habit-input-row';
-      // Posición porcentual exacta respecto a los 1000x950 píxeles
-      row.style.left = `${(straightStartX / W) * 100}%`;
-      row.style.top = `${(yTop / H) * 100}%`;
-      row.style.width = `${((straightEndX - straightStartX - 15) / W) * 100}%`;
-
-      row.innerHTML = `
-        <span class="habit-num">${i + 1}.</span>
-        <input type="text" class="habit-input" id="h-name-${i}" placeholder="Escribe tu hábito ${i + 1}...">
-      `;
-      inputsContainer.appendChild(row);
-
-      const input = row.querySelector('input');
+      const input = document.getElementById(`h-name-${i}`);
       input.value = habits[i] || '';
       input.addEventListener('input', (e) => {
         habits[i] = e.target.value;
@@ -398,7 +402,6 @@
         renderQuickToggles();
       });
 
-      // Metas
       const targetInput = document.getElementById(`target-${i}`);
       targetInput.value = targets[i] || '';
       targetInput.addEventListener('input', (e) => {
@@ -448,7 +451,7 @@
 
           updateAchievedCounts();
           renderQuickToggles();
-          draw(1);
+          renderSvg(1);
         });
 
         container.appendChild(btn);
@@ -462,130 +465,103 @@
       }
     }
 
-    // DIBUJAR LA RUEDA Y LÍNEAS
-    function draw(progress) {
-      ctx.clearRect(0, 0, W, H);
-      ctx.strokeStyle = '#FFFFFF';
-      ctx.fillStyle = '#FFFFFF';
-      ctx.lineWidth = 1.6;
+    // Renderizado SVG preciso
+    function renderSvg(progress) {
+      const svg = document.getElementById('wheelSvg');
+      let html = '';
 
-      // 1. Líneas rectas horizontales de hábitos (6 líneas para 5 carriles)
+      // 1. Líneas rectas horizontales
       for (let i = 0; i <= HABIT_COUNT; i++) {
         const r = R_INNER + (HABIT_COUNT - i) * RING_THICKNESS;
         const y = CY - r;
-        const currentLineEnd = straightStartX + (straightEndX - straightStartX) * Math.min(1, progress * 2);
-        
-        ctx.beginPath();
-        ctx.moveTo(straightStartX, y);
-        ctx.lineTo(currentLineEnd, y);
-        ctx.stroke();
+        const curX2 = straightStartX + (straightEndX - straightStartX) * Math.min(1, progress * 2);
+
+        html += `<line x1="${straightStartX}" y1="${y}" x2="${curX2}" y2="${y}" stroke="#FFFFFF" stroke-width="1.8" />`;
       }
 
-      // Encabezado "Hábitos Diarios" ubicado con buen margen sobre la línea 1
-      const topY = CY - (R_INNER + HABIT_COUNT * RING_THICKNESS) - 18;
-      ctx.font = '700 22px "Comfortaa"';
-      ctx.textAlign = 'left';
-      ctx.fillText('Hábitos Diarios', straightStartX, topY);
+      // 2. Mes dinámico al centro, en negrita y subrayado
+      html += `
+        <text x="${CX}" y="${CY - 6}" fill="#FFFFFF" font-size="34" font-weight="700" font-family="Comfortaa" text-anchor="middle" dominant-baseline="middle">
+          ${currentMonthName}
+        </text>
+        <line x1="${CX - 85}" y1="${CY + 22}" x2="${CX + 85}" y2="${CY + 22}" stroke="#FFFFFF" stroke-width="2.6" />
+      `;
 
-      // 2. Mes al centro: Tipografía Comfortaa, en negrita y subrayado
-      ctx.save();
-      ctx.font = '700 32px "Comfortaa"';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      
-      const monthY = CY;
-      ctx.fillText(currentMonthName, CX, monthY);
+      if (progress >= 0.3) {
+        const spiralProgress = (progress - 0.3) / 0.7;
+        const startAngle = -Math.PI / 2;
+        const totalSweep = 2 * Math.PI * 0.75;
+        const currentSweep = totalSweep * spiralProgress;
+        const dayAngleStep = totalSweep / DAYS_IN_MONTH;
 
-      const textMetrics = ctx.measureText(currentMonthName);
-      const underlineWidth = textMetrics.width + 16;
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      ctx.moveTo(CX - underlineWidth / 2, monthY + 22);
-      ctx.lineTo(CX + underlineWidth / 2, monthY + 22);
-      ctx.stroke();
-      ctx.restore();
+        // 3. Arcos concéntricos
+        for (let i = 0; i <= HABIT_COUNT; i++) {
+          const r = R_INNER + (HABIT_COUNT - i) * RING_THICKNESS;
+          const endA = startAngle + currentSweep;
+          const x1 = CX + r * Math.cos(startAngle);
+          const y1 = CY + r * Math.sin(startAngle);
+          const x2 = CX + r * Math.cos(endA);
+          const y2 = CY + r * Math.sin(endA);
+          const largeArc = currentSweep > Math.PI ? 1 : 0;
 
-      if (progress < 0.3) return;
-
-      const spiralProgress = (progress - 0.3) / 0.7;
-      const startAngle = -Math.PI / 2; // arriba
-      const totalSweep = 2 * Math.PI * 0.75; // 270 grados
-      const currentSweep = totalSweep * spiralProgress;
-
-      // 3. Arcos concéntricos de la espiral
-      for (let i = 0; i <= HABIT_COUNT; i++) {
-        const r = R_INNER + (HABIT_COUNT - i) * RING_THICKNESS;
-        ctx.beginPath();
-        ctx.arc(CX, CY, r, startAngle, startAngle + currentSweep, false);
-        ctx.stroke();
-      }
-
-      // 4. Rayos divisores de los 31 días y números exteriores
-      const dayAngleStep = totalSweep / DAYS_IN_MONTH;
-
-      for (let d = 0; d <= DAYS_IN_MONTH; d++) {
-        const angle = startAngle + d * dayAngleStep;
-        if (angle > startAngle + currentSweep) break;
-
-        const cos = Math.cos(angle);
-        const sin = Math.sin(angle);
-
-        ctx.beginPath();
-        ctx.moveTo(CX + R_INNER * cos, CY + R_INNER * sin);
-        ctx.lineTo(CX + (R_INNER + HABIT_COUNT * RING_THICKNESS) * cos, CY + (R_INNER + HABIT_COUNT * RING_THICKNESS) * sin);
-        ctx.stroke();
-
-        // Número de día en el perímetro exterior
-        if (d > 0) {
-          const midAngle = startAngle + (d - 0.5) * dayAngleStep;
-          const numR = R_INNER + HABIT_COUNT * RING_THICKNESS + 24;
-          const nx = CX + numR * Math.cos(midAngle);
-          const ny = CY + numR * Math.sin(midAngle);
-
-          ctx.save();
-          ctx.font = '600 15px "Comfortaa"';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(d.toString(), nx, ny);
-          ctx.restore();
+          html += `<path d="M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}" fill="none" stroke="#FFFFFF" stroke-width="1.8" />`;
         }
-      }
 
-      // 5. Tics completados dentro de las celdas
-      for (let h = 0; h < HABIT_COUNT; h++) {
-        const rMid = R_INNER + (HABIT_COUNT - h - 0.5) * RING_THICKNESS;
-        for (let d = 0; d < DAYS_IN_MONTH; d++) {
-          if (habitsData[h][d]) {
-            const angleMid = startAngle + (d + 0.5) * dayAngleStep;
-            if (angleMid <= startAngle + currentSweep) {
-              const x = CX + rMid * Math.cos(angleMid);
-              const y = CY + rMid * Math.sin(angleMid);
+        // 4. Rayos divisores de días y números exteriores
+        for (let d = 0; d <= DAYS_IN_MONTH; d++) {
+          const a = startAngle + d * dayAngleStep;
+          if (a > startAngle + currentSweep) break;
 
-              ctx.save();
-              ctx.font = '700 20px "Comfortaa"';
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillText('✓', x, y);
-              ctx.restore();
+          const cos = Math.cos(a);
+          const sin = Math.sin(a);
+          const x1 = CX + R_INNER * cos;
+          const y1 = CY + R_INNER * sin;
+          const x2 = CX + (R_INNER + HABIT_COUNT * RING_THICKNESS) * cos;
+          const y2 = CY + (R_INNER + HABIT_COUNT * RING_THICKNESS) * sin;
+
+          html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#FFFFFF" stroke-width="1.4" />`;
+
+          // Números de días
+          if (d > 0) {
+            const midA = startAngle + (d - 0.5) * dayAngleStep;
+            const rNum = R_INNER + HABIT_COUNT * RING_THICKNESS + 25;
+            const nx = CX + rNum * Math.cos(midA);
+            const ny = CY + rNum * Math.sin(midA);
+
+            html += `<text x="${nx}" y="${ny}" fill="#FFFFFF" font-size="16" font-weight="600" font-family="Comfortaa" text-anchor="middle" dominant-baseline="middle">${d}</text>`;
+          }
+        }
+
+        // 5. Tics completados
+        for (let h = 0; h < HABIT_COUNT; h++) {
+          const rMid = R_INNER + (HABIT_COUNT - h - 0.5) * RING_THICKNESS;
+          for (let d = 0; d < DAYS_IN_MONTH; d++) {
+            if (habitsData[h][d]) {
+              const midA = startAngle + (d + 0.5) * dayAngleStep;
+              if (midA <= startAngle + currentSweep) {
+                const tx = CX + rMid * Math.cos(midA);
+                const ty = CY + rMid * Math.sin(midA);
+                html += `<text x="${tx}" y="${ty + 1}" fill="#FFFFFF" font-size="22" font-weight="700" font-family="Comfortaa" text-anchor="middle" dominant-baseline="middle">✓</text>`;
+              }
             }
           }
         }
       }
+
+      svg.innerHTML = html;
     }
 
-    // Animación de entrada inicial
+    // Animación de entrada
+    let animProgress = 0;
     function runAnimation() {
       animProgress = 0;
-      isAnimating = true;
-
       function step() {
-        animProgress += 0.025;
+        animProgress += 0.03;
         if (animProgress >= 1) {
           animProgress = 1;
-          isAnimating = false;
-          draw(1);
+          renderSvg(1);
         } else {
-          draw(animProgress);
+          renderSvg(animProgress);
           requestAnimationFrame(step);
         }
       }
