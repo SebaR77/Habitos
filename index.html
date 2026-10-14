@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <!-- Zoom habilitado para explorar la rueda -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes, viewport-fit=cover">
   <title>Rueda de Hábitos</title>
   
@@ -10,7 +9,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
 
-  <!-- Ícono oficial para la pantalla de inicio de iPhone (Rueda espiral minimalista) -->
+  <!-- Ícono minimalista para iPhone -->
   <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180' width='180' height='180'%3E%3Crect width='180' height='180' fill='%23000000' rx='40'/%3E%3Ccircle cx='90' cy='90' r='55' fill='none' stroke='%23FFFFFF' stroke-width='6' stroke-dasharray='220 50'/%3E%3Ccircle cx='90' cy='90' r='38' fill='none' stroke='%23FFFFFF' stroke-width='5' stroke-dasharray='150 40'/%3E%3Ccircle cx='90' cy='90' r='22' fill='none' stroke='%23FFFFFF' stroke-width='4' stroke-dasharray='90 30'/%3E%3Ccircle cx='90' cy='35' r='5' fill='%2300FF66'/%3E%3C/svg%3E">
 
   <!-- Fuente Comfortaa -->
@@ -31,23 +30,26 @@
       color: #FFFFFF;
       font-family: 'Comfortaa', cursive, sans-serif;
       min-height: 100vh;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: env(safe-area-inset-top, 20px) 16px env(safe-area-inset-bottom, 24px) 16px;
+      justify-content: flex-start;
+      padding: env(safe-area-inset-top, 8px) 14px env(safe-area-inset-bottom, 10px) 14px;
       overflow-x: hidden;
+      overflow-y: auto;
     }
 
     /* Cartel ¡SIU! animado */
     #siu-banner {
       position: fixed;
-      top: 55px;
+      top: 45px;
       left: 50%;
       transform: translateX(-50%) scale(0.2);
       opacity: 0;
       pointer-events: none;
       z-index: 9999;
-      font-size: 3.2rem;
+      font-size: 3rem;
       font-weight: 700;
       letter-spacing: 2px;
       color: #FFFFFF;
@@ -64,19 +66,19 @@
     /* Cartel FELICITACIONES CRACK */
     #congrats-banner {
       position: fixed;
-      top: 60px;
+      top: 50px;
       left: 50%;
       transform: translateX(-50%) scale(0.3);
       opacity: 0;
       pointer-events: none;
       z-index: 9999;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       font-weight: 700;
       color: #000000;
       background: #FFFFFF;
-      padding: 12px 20px;
-      border-radius: 30px;
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+      padding: 10px 18px;
+      border-radius: 25px;
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.85);
       transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       white-space: nowrap;
     }
@@ -88,58 +90,77 @@
 
     header {
       width: 100%;
-      max-width: 500px;
+      max-width: 460px;
       text-align: center;
-      margin-top: 6px;
-      margin-bottom: 6px;
+      margin-top: 2px;
+      margin-bottom: 2px;
     }
 
     header h1 {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
 
-    /* Selector sutil de Mes */
+    /* Selector minimalista de Mes con flechas SVG */
     .month-nav {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      margin-bottom: 8px;
-      font-size: 0.85rem;
+      gap: 14px;
+      margin-bottom: 4px;
+      font-size: 0.82rem;
       font-weight: 700;
     }
 
-    .month-nav button {
+    .nav-arrow-btn {
       background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       color: #FFFFFF;
-      font-family: 'Comfortaa', cursive, sans-serif;
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      border-radius: 12px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 0;
+    }
+
+    .nav-arrow-btn:active {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-arrow-btn svg {
+      width: 12px;
+      height: 12px;
+      stroke: #FFFFFF;
+      stroke-width: 2.2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .main-wrapper {
       width: 100%;
-      max-width: 500px;
+      max-width: 460px;
       position: relative;
     }
 
     .section-title {
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       font-weight: 700;
-      margin-left: 6px;
-      margin-bottom: 8px;
+      margin-left: 4px;
+      margin-bottom: 2px;
       color: #FFFFFF;
     }
 
+    /* Rueda compacta sin márgenes perdidos */
     .spiral-container {
       width: 100%;
       position: relative;
-      aspect-ratio: 1000 / 920;
+      aspect-ratio: 1000 / 860;
     }
 
     svg.wheel-svg {
@@ -162,21 +183,22 @@
       position: absolute;
       left: 3%;
       width: 46%;
-      height: 5%;
+      height: 5.2%;
       display: flex;
       align-items: center;
       pointer-events: auto;
     }
 
-    .slot-1 { top: 14.5%; }
-    .slot-2 { top: 19.5%; }
-    .slot-3 { top: 24.5%; }
-    .slot-4 { top: 29.5%; }
-    .slot-5 { top: 34.5%; }
+    /* Coordenadas precisas para los 5 carriles */
+    .slot-1 { top: 9.2%; }
+    .slot-2 { top: 14.6%; }
+    .slot-3 { top: 20.0%; }
+    .slot-4 { top: 25.4%; }
+    .slot-5 { top: 30.8%; }
 
     .slot-num {
-      width: 22px;
-      font-size: clamp(0.72rem, 2.3vw, 0.88rem);
+      width: 18px;
+      font-size: clamp(0.7rem, 2.2vw, 0.82rem);
       font-weight: 700;
       color: #FFFFFF;
       flex-shrink: 0;
@@ -188,10 +210,10 @@
       outline: none;
       color: #FFFFFF;
       font-family: 'Comfortaa', cursive, sans-serif;
-      font-size: clamp(0.68rem, 2vw, 0.82rem);
+      font-size: clamp(0.65rem, 1.9vw, 0.78rem);
       font-weight: 600;
       width: 100%;
-      padding-left: 4px;
+      padding-left: 2px;
       user-select: text;
     }
 
@@ -200,20 +222,21 @@
       font-style: italic;
     }
 
+    /* Barra de acción rápida compactada */
     .quick-actions {
       width: 100%;
-      max-width: 500px;
-      margin-top: 14px;
-      padding: 12px;
+      max-width: 460px;
+      margin-top: 6px;
+      padding: 8px 10px;
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
+      border-radius: 10px;
       background: rgba(255, 255, 255, 0.03);
     }
 
     .quick-title {
-      font-size: 0.85rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -222,29 +245,29 @@
     .quick-day-badge {
       background: #FFFFFF;
       color: #000000;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 0.75rem;
+      padding: 1px 7px;
+      border-radius: 8px;
+      font-size: 0.7rem;
       font-weight: 700;
     }
 
     .habit-toggles {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
     .toggle-btn {
       background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.22);
       color: #FFFFFF;
       font-family: 'Comfortaa', cursive, sans-serif;
-      padding: 8px 12px;
-      border-radius: 8px;
+      padding: 6px 10px;
+      border-radius: 7px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -255,14 +278,14 @@
     }
 
     .toggle-check {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border: 1.5px solid #FFFFFF;
       border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       font-weight: bold;
     }
 
@@ -271,24 +294,25 @@
       color: #000000;
     }
 
+    /* Tabla resumen compacta */
     .table-container {
       width: 100%;
-      max-width: 500px;
-      margin-top: 14px;
-      overflow-x: auto;
+      max-width: 460px;
+      margin-top: 6px;
+      margin-bottom: 4px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      border: 1.5px solid #FFFFFF;
+      border: 1.2px solid #FFFFFF;
       text-align: center;
-      font-size: 0.72rem;
+      font-size: 0.68rem;
     }
 
     th, td {
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      padding: 6px 4px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 4px 2px;
     }
 
     th {
@@ -303,19 +327,20 @@
       font-family: 'Comfortaa', cursive, sans-serif;
       text-align: center;
       width: 100%;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       user-select: text;
     }
 
     .replay-btn {
-      margin-top: 16px;
+      margin-top: 6px;
+      margin-bottom: 12px;
       background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: rgba(255, 255, 255, 0.6);
       font-family: 'Comfortaa', cursive, sans-serif;
-      font-size: 0.75rem;
-      padding: 6px 14px;
-      border-radius: 20px;
+      font-size: 0.7rem;
+      padding: 4px 12px;
+      border-radius: 16px;
       cursor: pointer;
     }
   </style>
@@ -329,17 +354,22 @@
     <h1>Rueda de Hábitos</h1>
   </header>
 
+  <!-- Flechas minimalistas SVG de trazo fino -->
   <div class="month-nav">
-    <button id="prevMonthBtn">◀</button>
+    <button class="nav-arrow-btn" id="prevMonthBtn" aria-label="Mes anterior">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
     <span id="monthNavLabel">Octubre 2026</span>
-    <button id="nextMonthBtn">▶</button>
+    <button class="nav-arrow-btn" id="nextMonthBtn" aria-label="Mes siguiente">
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
   </div>
 
   <div class="main-wrapper">
     <div class="section-title">Hábitos Diarios</div>
 
     <div class="spiral-container">
-      <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 1000 920"></svg>
+      <svg class="wheel-svg" id="wheelSvg" viewBox="0 0 1000 860"></svg>
       
       <div class="inputs-layer">
         <div class="slot slot-1">
@@ -375,7 +405,7 @@
     <div class="habit-toggles" id="togglesContainer"></div>
   </div>
 
-  <!-- Tabla inferior -->
+  <!-- Tabla inferior compacta -->
   <div class="table-container">
     <table>
       <thead>
@@ -418,7 +448,6 @@
     const realCurrentMonth = today.getMonth();
     const realCurrentYear = today.getFullYear();
 
-    // Estado del mes visualizado
     let viewYear = realCurrentYear;
     let viewMonth = realCurrentMonth;
 
@@ -435,7 +464,6 @@
       "Dormir 8 horas"
     ];
 
-    // Cargar nombres globales de hábitos
     let habits = JSON.parse(localStorage.getItem('user_habits_names')) || defaultHabits;
 
     function getMonthKey(y, m) {
@@ -449,7 +477,6 @@
     function loadMonthData() {
       const key = getMonthKey(viewYear, viewMonth);
       const days = getDaysInViewMonth();
-      
       let data = JSON.parse(localStorage.getItem(key));
       if (!data) {
         data = Array.from({ length: HABIT_COUNT }, () => Array(days).fill(false));
@@ -466,15 +493,14 @@
     let habitsData = loadMonthData();
     let targets = loadMonthTargets();
 
-    // SVG Config
+    // Geometría compacta (sin holguras sobrantes)
     const CX = 520;
-    const CY = 520;
+    const CY = 470;
     const R_INNER = 160;
     const RING_THICKNESS = 46;
     const straightStartX = 25;
     const straightEndX = CX;
 
-    // Inicializar inputs de hábitos
     for (let i = 0; i < HABIT_COUNT; i++) {
       const input = document.getElementById(`h-name-${i}`);
       input.value = habits[i] || '';
@@ -634,7 +660,6 @@
 
             html += `<text x="${nx}" y="${ny}" fill="#FFFFFF" font-size="16" font-weight="600" font-family="Comfortaa" text-anchor="middle" dominant-baseline="middle">${d}</text>`;
 
-            // PUNTITO VERDE SOBRE EL DÍA ACTUAL
             if (isCurrentMonthView && d === realCurrentDay) {
               const rDot = R_INNER + HABIT_COUNT * RING_THICKNESS + 42;
               const dotX = CX + rDot * Math.cos(midA);
@@ -663,7 +688,6 @@
       svg.innerHTML = html;
     }
 
-    // Navegación de mes
     function updateMonthNavigation() {
       document.getElementById('monthNavLabel').innerText = `${meses[viewMonth]} ${viewYear}`;
       habitsData = loadMonthData();
@@ -710,7 +734,6 @@
 
     document.getElementById('replayBtn').addEventListener('click', runAnimation);
 
-    // Arranque inicial
     updateMonthNavigation();
     runAnimation();
   </script>
